@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#123328">
+  <meta name="description" content="Calculadora de mescla gasolina i oli per a motors de dos temps. Ràpida, instal·lable i disponible sense connexió.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Mescla 2T">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Mescla 2T · Calculadora de gasolina i oli</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="Mescla 2T">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 2C12.5 8.2 6 14.3 6 20a10 10 0 0 0 20 0c0-5.7-6.5-11.8-10-18Z" fill="currentColor"/><path d="M11 22c1 3 3 4 6 4" fill="none" stroke="#f8f5ec" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+        <span>MESCLA<span class="brand-accent">/2T</span></span>
+      </div>
+      <span class="top-pill"><span class="status-dot"></span> A punt per rodar</span>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="title">
+        <div class="eyebrow"><span class="eyebrow-line"></span> EINA PER A MOTORS DE DOS TEMPS</div>
+        <h1 id="title">La mescla justa.<br><em>Sense embolics.</em></h1>
+        <p>De gasolina a oli, o a l’inrevés. Tria el percentatge i omple el dipòsit amb confiança.</p>
+      </section>
+
+      <section class="calculator" aria-label="Calculadora de mescla">
+        <div class="section-heading"><span>01 / CALCULA</span><span>RÀPID I PRECÍS</span></div>
+        <div class="mode-switch" role="group" aria-label="Direcció del càlcul">
+          <button type="button" class="mode active" id="mode-fuel" aria-pressed="true"><span class="mode-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v15M4 20h13M16 7l3 3v7a2 2 0 0 0 4 0v-5l-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 7h7v5H7z" stroke="currentColor" stroke-width="1.6"/></svg></span> Tinc gasolina</button>
+          <button type="button" class="mode" id="mode-oil" aria-pressed="false"><span class="mode-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C9 7.2 5 11 5 15a7 7 0 0 0 14 0c0-4-4-7.8-7-13Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 16a3 3 0 0 0 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span> Tinc oli</button>
+        </div>
+
+        <div class="panel">
+          <div class="field-top"><label for="amount" id="amount-label">Quanta gasolina tens?</label><span id="amount-unit-label">LITRES</span></div>
+          <div class="amount-wrap"><input id="amount" name="amount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" value="5" aria-describedby="amount-error"><span id="amount-suffix">L</span></div>
+          <p class="field-error" id="amount-error" aria-live="polite"></p>
+          <div class="quick-values" id="quick-values" aria-label="Quantitats habituals"></div>
+
+          <div class="divider"></div>
+          <div class="field-top"><label id="percent-label">Percentatge d’oli</label><span>OLI / GASOLINA</span></div>
+          <div class="percent-options" id="percent-options" role="group" aria-labelledby="percent-label"></div>
+          <div class="custom-row" id="custom-row" hidden><label for="custom-percent">Percentatge personalitzat</label><div class="custom-input"><input id="custom-percent" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex. 1,75" aria-describedby="percent-error"><span>%</span></div></div>
+          <p class="field-error" id="percent-error" aria-live="polite"></p>
+        </div>
+
+        <div class="result" id="result-card" aria-live="polite">
+          <div class="result-glow" aria-hidden="true"></div>
+          <div class="result-label"><span class="result-icon" aria-hidden="true">↗</span><span id="result-heading">OLI QUE HAS D’AFEGIR</span></div>
+          <div class="result-number"><strong id="result-value">100</strong><span id="result-unit">ml</span></div>
+          <p id="result-detail">Per a 5 L de gasolina al 2%.</p>
+          <div class="result-foot"><span class="check-icon" aria-hidden="true">✓</span><span id="result-note">Afegeix l’oli a la gasolina i barreja bé.</span></div>
+        </div>
+      </section>
+
+      <section class="reference" aria-labelledby="reference-title">
+        <div class="section-heading"><span>02 / CONSULTA RÀPIDA</span><span>PER TENIR-HO A MÀ</span></div>
+        <div class="reference-card">
+          <div class="reference-title"><div><h2 id="reference-title">Taula de mescles</h2><p id="reference-subtitle">Oli necessari al 2% per cada volum de gasolina.</p></div><span class="reference-symbol" aria-hidden="true">↗</span></div>
+          <div class="table-head"><span>GASOLINA</span><span>OLI NECESSARI</span></div>
+          <div id="reference-rows"></div>
+        </div>
+      </section>
+
+      <section class="help" aria-label="Informació important">
+        <span class="help-icon" aria-hidden="true">i</span>
+        <p>El percentatge es calcula <strong>sobre el volum de gasolina</strong>. Consulta sempre la proporció recomanada pel fabricant del motor i de l’oli.</p>
+      </section>
+      <button type="button" id="install-button" class="install-button" hidden>↓ &nbsp; Instal·la l’app al mòbil</button>
+    </main>
+    <button type="button" id="mobile-result" class="mobile-result" aria-label="Mostra el resultat"><span id="mobile-result-label">OLI A AFEGIR</span><strong><span id="mobile-result-value">100</span> <span id="mobile-result-unit">ml</span></strong><span aria-hidden="true">↑</span></button>
+    <footer>FETA PER EMBRUTAR-SE LES MANS, NO PER FER NÚMEROS. <span>✳</span></footer>
+  </div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
