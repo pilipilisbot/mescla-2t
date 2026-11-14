@@ -18,14 +18,12 @@ function renderMode() {
     $(`mode-${mode}`).classList.toggle('active', state.mode === mode);
     $(`mode-${mode}`).setAttribute('aria-pressed', String(state.mode === mode));
   }
-  $('amount-label').textContent = state.mode === 'fuel' ? 'Quanta gasolina tens?' : 'Quant oli tens?';
+  $('amount-label').textContent = state.mode === 'fuel' ? '3. Quanta gasolina tens?' : '3. Quant oli tens?';
   $('amount-unit-label').textContent = state.mode === 'fuel' ? 'LITRES' : 'MIL·LILITRES';
   $('amount-suffix').textContent = state.mode === 'fuel' ? 'L' : 'ml';
   $('amount').value = state.amounts[state.mode];
   $('result-heading').textContent = state.mode === 'fuel' ? 'OLI QUE HAS D’AFEGIR' : 'GASOLINA QUE NECESSITES';
   $('result-unit').textContent = state.mode === 'fuel' ? 'ml' : 'L';
-  $('mobile-result-label').textContent = state.mode === 'fuel' ? 'OLI A AFEGIR' : 'GASOLINA NECESSÀRIA';
-  $('mobile-result-unit').textContent = state.mode === 'fuel' ? 'ml' : 'L';
   $('quick-values').replaceChildren(...quickValues[state.mode].map((value) => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -90,13 +88,11 @@ function update() {
     }
     const result = state.mode === 'fuel' ? oilForGasoline(amount, percent) : gasolineForOil(amount, percent);
     $('result-value').textContent = format(result, state.mode === 'fuel' ? 2 : 3);
-    $('mobile-result-value').textContent = $('result-value').textContent;
     $('result-detail').textContent = state.mode === 'fuel'
       ? `Per a ${format(amount, 3)} L de gasolina al ${format(percent)}%.`
       : `Amb ${format(amount, 2)} ml d’oli al ${format(percent)}%.`;
   } else {
     $('result-value').textContent = '—';
-    $('mobile-result-value').textContent = '—';
     $('result-detail').textContent = 'Introdueix una quantitat i un percentatge vàlids.';
   }
   renderReference(percentValid ? percent : state.percent);
@@ -138,6 +134,3 @@ $('install-button').addEventListener('click', async () => {
   $('install-button').hidden = true;
 });
 window.addEventListener('appinstalled', () => { $('install-button').hidden = true; });
-
-$('mobile-result').addEventListener('click', () => $('result-card').scrollIntoView({ behavior: 'smooth', block: 'center' }));
-new IntersectionObserver(([entry]) => $('mobile-result').classList.toggle('out-of-view', !entry.isIntersecting), { threshold: 0.35 }).observe($('result-card'));
