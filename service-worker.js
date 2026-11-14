@@ -1,5 +1,5 @@
-const CACHE = 'mescla-2t-v7';
-const ASSETS = ['./', './index.html', './styles.css', './app.js', './math.js', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png'];
+const CACHE = 'mescla-2t-v8';
+const ASSETS = ['./', './index.html', './styles.css', './app.js', './math.js', './stations.js', './provinces.json', './vendor/leaflet.js', './vendor/leaflet.css', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png'];
 
 function versionedUrl(url) {
   const fresh = new URL(url, self.registration.scope);

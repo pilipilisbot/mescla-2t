@@ -21,7 +21,10 @@
       <span class="top-pill">Calculadora 2T</span>
     </header>
 
+    <nav class="app-tabs" aria-label="Seccions"><button type="button" class="app-tab active" id="tab-calculator" aria-controls="calculator-panel" aria-selected="true">Calculadora</button><button type="button" class="app-tab" id="tab-stations" aria-controls="stations-panel" aria-selected="false">Gasolineres</button></nav>
+
     <main>
+      <div id="calculator-panel">
       <h1 class="sr-only">Calculadora de mescla de gasolina i oli per a motors de dos temps</h1>
       <section class="calculator" aria-label="Calculadora de mescla">
         <div class="step-heading"><span id="percent-label">1. Tria el percentatge d’oli</span><span>OLI / GASOLINA</span></div>
@@ -53,8 +56,22 @@
       <p id="share-status" class="share-status" role="status" aria-live="polite"></p>
       <p class="help">El percentatge és sobre la gasolina. Segueix sempre la proporció recomanada pel fabricant del motor i de l’oli.</p>
       <button type="button" id="install-button" class="install-button" hidden>Instal·la l’app al mòbil</button>
+      </div>
+      <section id="stations-panel" class="stations-panel" aria-labelledby="stations-title" hidden>
+        <h1 id="stations-title">Gasolineres · Super 95</h1>
+        <p class="stations-intro">Preus oficials de gasolina 95 E5. Tria una zona o cerca amb el GPS.</p>
+        <div class="station-controls"><button type="button" id="near-me" class="near-me">A prop meu</button><label for="province-select">Província<select id="province-select"><option value="">Tria província</option></select></label></div>
+        <div class="station-filters"><label for="radius-select">Radi <select id="radius-select"><option value="10">10 km</option><option value="25" selected>25 km</option><option value="50">50 km</option></select></label><label for="sort-select">Ordena <select id="sort-select"><option value="distance">Distància</option><option value="price">Preu</option></select></label><button type="button" id="stations-refresh" class="refresh-button">Actualitza</button></div>
+        <p id="stations-status" class="stations-status" role="status" aria-live="polite">Prem «A prop meu» o tria una província.</p>
+        <p id="stations-updated" class="stations-updated"></p>
+        <div id="stations-map" class="stations-map" aria-label="Mapa de gasolineres"></div>
+        <ol id="stations-list" class="stations-list"></ol>
+        <p class="stations-source">Preus: Ministeri per a la Transició Ecològica. Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>. La disponibilitat i el preu final s’han de confirmar a l’estació.</p>
+      </section>
     </main>
   </div>
+  <link rel="stylesheet" href="./vendor/leaflet.css">
+  <script src="./vendor/leaflet.js" defer></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

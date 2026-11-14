@@ -1,4 +1,5 @@
 import { oilForGasoline, gasolineForOil, parsePositiveDecimal } from './math.js';
+import { initStations } from './stations.js';
 
 const presetPercents = [1, 1.5, 2, 2.5, 3, 4];
 const quickValues = { fuel: [1, 2, 5, 10, 20], oil: [20, 50, 100, 200, 500] };
@@ -148,7 +149,7 @@ if ('serviceWorker' in navigator) {
 
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./service-worker.js?v=7', { scope: './', updateViaCache: 'none' });
+      const registration = await navigator.serviceWorker.register('./service-worker.js?v=8', { scope: './', updateViaCache: 'none' });
       let lastCheck = Date.now();
       const checkForUpdates = () => {
         if (document.visibilityState !== 'visible' || Date.now() - lastCheck < 30000) return;
@@ -176,3 +177,17 @@ $('install-button').addEventListener('click', async () => {
   $('install-button').hidden = true;
 });
 window.addEventListener('appinstalled', () => { $('install-button').hidden = true; });
+
+const stations = initStations();
+for (const tab of ['calculator', 'stations']) {
+  $(`tab-${tab}`).addEventListener('click', () => {
+    const showStations = tab === 'stations';
+    $('calculator-panel').hidden = showStations;
+    $('stations-panel').hidden = !showStations;
+    for (const name of ['calculator', 'stations']) {
+      $(`tab-${name}`).classList.toggle('active', name === tab);
+      $(`tab-${name}`).setAttribute('aria-selected', String(name === tab));
+    }
+    if (showStations) stations.show();
+  });
+}
