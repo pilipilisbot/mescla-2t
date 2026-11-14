@@ -104,7 +104,29 @@ renderPercents();
 if (state.custom) $('custom-percent').value = String(state.percent).replace('.', ',');
 renderMode();
 
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
+if ('serviceWorker' in navigator) {
+  const hadController = Boolean(navigator.serviceWorker.controller);
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hadController) window.location.reload();
+  });
+
+  window.addEventListener('load', async () => {
+    try {
+      const registerLatest = () => navigator.serviceWorker.register(`./service-worker.js?check=${Date.now()}`, { scope: './', updateViaCache: 'none' });
+      await registerLatest();
+      let lastCheck = Date.now();
+      const checkForUpdates = () => {
+        if (document.visibilityState !== 'visible' || Date.now() - lastCheck < 30000) return;
+        lastCheck = Date.now();
+        registerLatest().catch(() => {});
+      };
+      window.addEventListener('focus', checkForUpdates);
+      document.addEventListener('visibilitychange', checkForUpdates);
+    } catch {
+      // The calculator remains usable even if service workers are unavailable.
+    }
+  });
+}
 let installPrompt;
 window.addEventListener('beforeinstallprompt', (event) => {
   event.preventDefault();
