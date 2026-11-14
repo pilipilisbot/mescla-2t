@@ -104,6 +104,30 @@ renderPercents();
 if (state.custom) $('custom-percent').value = String(state.percent).replace('.', ',');
 renderMode();
 
+const appUrl = 'https://pilipilisbot.github.io/mescla-2t/';
+$('share-button').addEventListener('click', async () => {
+  const status = $('share-status');
+  status.replaceChildren();
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Mescla 2T', text: 'Calculadora de mescla gasolina i oli per a motors 2T', url: appUrl });
+      return;
+    } catch (error) {
+      if (error.name === 'AbortError') return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(appUrl);
+    status.textContent = 'Enllaç copiat. Ja el pots enganxar i enviar.';
+  } catch {
+    status.append('Copia aquest enllaç: ');
+    const link = document.createElement('a');
+    link.href = appUrl;
+    link.textContent = appUrl;
+    status.append(link);
+  }
+});
+
 if ('serviceWorker' in navigator) {
   const hadController = Boolean(navigator.serviceWorker.controller);
   navigator.serviceWorker.addEventListener('controllerchange', () => {
