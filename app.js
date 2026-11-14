@@ -95,21 +95,6 @@ function update() {
     $('result-value').textContent = '—';
     $('result-detail').textContent = 'Introdueix una quantitat i un percentatge vàlids.';
   }
-  renderReference(percentValid ? percent : state.percent);
-}
-
-function renderReference(percent) {
-  $('reference-subtitle').textContent = `Oli necessari al ${format(percent)}% per cada volum de gasolina.`;
-  $('reference-rows').replaceChildren(...[1, 2, 5, 10, 20].map((litres) => {
-    const row = document.createElement('div');
-    row.className = 'table-row';
-    const fuel = document.createElement('span');
-    fuel.textContent = `${litres} L`;
-    const oil = document.createElement('strong');
-    oil.textContent = `${format(oilForGasoline(litres, percent))} ml`;
-    row.append(fuel, oil);
-    return row;
-  }));
 }
 
 for (const mode of ['fuel', 'oil']) $('mode-' + mode).addEventListener('click', () => { state.mode = mode; renderMode(); });

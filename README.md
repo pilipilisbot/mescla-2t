@@ -5,7 +5,7 @@ PWA mòbil, en català, per calcular la mescla de gasolina i oli de motors de do
 - **Tinc gasolina:** litres de gasolina → mil·lilitres d’oli.
 - **Tinc oli:** mil·lilitres d’oli → litres de gasolina.
 - Percentatges ràpids (1%, 1,5%, **2% per defecte**, 2,5%, 3%, 4%) i percentatge personalitzat entre 0,1% i 10%.
-- Taula de referència que s’actualitza segons el percentatge, ús sense connexió i instal·lació a la pantalla d’inici.
+- Ús sense connexió i instal·lació a la pantalla d’inici.
 - Sense dependències, comptes ni seguiment. El percentatge escollit queda desat al dispositiu.
 
 ## Fórmula
