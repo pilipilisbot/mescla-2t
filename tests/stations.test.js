@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { distanceKm, provincesNear } from '../stations.js';
+import { distanceKm, provincesNear, priceBands } from '../stations.js';
 
 test('GPS radius crosses provincial boundaries', () => {
   const provinces = [
@@ -16,4 +16,16 @@ test('distance is measured in km, not lat/lon degrees', () => {
   assert.equal(distanceKm(girona, girona), 0);
   assert.ok(distanceKm(girona, { lat: 41.9794, lon: 2.9214 }) > 8);
   assert.ok(distanceKm(girona, { lat: 41.9794, lon: 2.9214 }) < 9);
+});
+
+
+test('price traffic light keeps equal prices in the same band and marks both extremes', () => {
+  const bands = priceBands([{ price: 1.4 }, { price: 1.4 }, { price: 1.5 }, { price: 1.6 }, { price: 1.7 }]);
+  assert.equal(bands.min, 1.4);
+  assert.equal(bands.max, 1.7);
+  assert.equal(bands.tier(1.4), 'cheap');
+  assert.equal(bands.tier(1.5), 'medium');
+  assert.equal(bands.tier(1.6), 'medium');
+  assert.equal(bands.tier(1.7), 'expensive');
+  assert.equal(priceBands([{ price: 1.5 }]).tier(1.5), 'medium');
 });

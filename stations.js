@@ -34,6 +34,23 @@ function normaliseStation(raw) {
   };
 }
 
+export function priceBands(stations) {
+  const prices = stations.map((station) => station.price).filter(Number.isFinite);
+  if (!prices.length) return null;
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const third = (max - min) / 3;
+  return {
+    min, max,
+    tier(price) {
+      if (min === max) return 'medium';
+      if (price === min || price < min + third - 1e-9) return 'cheap';
+      if (price === max || price > max - third + 1e-9) return 'expensive';
+      return 'medium';
+    },
+  };
+}
+
 export function initStations() {
   let provinces;
   let map;
@@ -42,11 +59,15 @@ export function initStations() {
   let mode = 'province';
   let activeProvince = '17';
   let stations = [];
+  let selectedId = null;
+  const markerById = new Map();
+  const itemById = new Map();
   let request = 0;
   const cache = new Map();
   const status = $('stations-status');
   const updated = $('stations-updated');
   const list = $('stations-list');
+  const legend = $('stations-legend');
   const provinceSelect = $('province-select');
   const radiusSelect = $('radius-select');
   const sortSelect = $('sort-select');
@@ -63,6 +84,30 @@ export function initStations() {
     markers = L.layerGroup().addTo(map);
   }
 
+  function stationId(station) { return String(station.id || `${station.lat},${station.lon}`); }
+
+  function selectStation(id, fromList = false, scrollList = true) {
+    selectedId = id;
+    for (const [key, item] of itemById) {
+      const selected = key === id;
+      item.classList.toggle('selected', selected);
+      item.querySelector('.station-select').setAttribute('aria-pressed', String(selected));
+    }
+    for (const [key, marker] of markerById) {
+      marker.getElement()?.classList.toggle('selected', key === id);
+      marker.setZIndexOffset(key === id ? 1000 : 0);
+    }
+    const item = itemById.get(id);
+    const marker = markerById.get(id);
+    if (fromList && marker && map) {
+      map.setView(marker.getLatLng(), Math.max(map.getZoom(), 14), { animate: true });
+      marker.openPopup();
+      $('stations-map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (item && scrollList) {
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
   function render() {
     const radius = Number(radiusSelect.value);
     const visible = (mode === 'gps' ? stations.filter((station) => distanceKm(point, station) <= radius) : stations)
@@ -71,7 +116,15 @@ export function initStations() {
         ? a.price - b.price || (a.distance ?? 0) - (b.distance ?? 0)
         : (a.distance ?? 0) - (b.distance ?? 0) || a.price - b.price);
     setStatus(visible.length ? `${visible.length} gasolineres amb preu de Super 95${mode === 'gps' ? ` a ${radius} km o menys` : ''}.` : 'No hi ha gasolineres amb preu de Super 95 en aquesta zona. Prova un radi més gran.');
+    const bands = priceBands(visible);
+    legend.hidden = !bands;
+    if (bands) {
+      $('stations-cheapest').textContent = `${euro(bands.min)} €/L`;
+      $('stations-priciest').textContent = `${euro(bands.max)} €/L`;
+    }
     list.replaceChildren();
+    itemById.clear();
+    markerById.clear();
     ensureMap();
     if (markers) markers.clearLayers();
     const bounds = [];
@@ -79,8 +132,16 @@ export function initStations() {
       L.circleMarker([point.lat, point.lon], { radius: 8, color: '#173a2d', fillColor: '#e9a14d', fillOpacity: 1 }).addTo(markers).bindPopup('La teva ubicació aproximada');
     }
     for (const station of visible.slice(0, 120)) {
+      const id = stationId(station);
+      const tier = bands.tier(station.price);
       const item = document.createElement('li');
-      item.className = 'station-card';
+      item.className = `station-card tier-${tier}`;
+      const choose = document.createElement('button');
+      choose.type = 'button';
+      choose.className = 'station-select';
+      choose.setAttribute('aria-pressed', 'false');
+      choose.setAttribute('aria-label', `Mostra ${station.name} al mapa, ${euro(station.price)} euros per litre`);
+      choose.addEventListener('click', () => selectStation(id, true));
       const heading = document.createElement('strong');
       heading.textContent = station.name;
       const price = document.createElement('span');
@@ -95,15 +156,25 @@ export function initStations() {
       route.target = '_blank';
       route.rel = 'noopener noreferrer';
       route.textContent = 'Com arribar-hi ↗';
-      item.append(heading, price, address, meta, route);
+      choose.append(heading, price, address, meta);
+      item.append(choose, route);
       list.append(item);
+      itemById.set(id, item);
       if (map) {
-        const marker = L.circleMarker([station.lat, station.lon], { radius: 6, color: '#173a2d', weight: 2, fillColor: '#e9a14d', fillOpacity: 0.95 }).addTo(markers);
+        const icon = L.divIcon({
+          className: `price-pin tier-${tier}`,
+          html: `<span>${euro(station.price)} €</span>`,
+          iconSize: [74, 30],
+          iconAnchor: [37, 15],
+        });
+        const marker = L.marker([station.lat, station.lon], { icon, title: `${station.name}: ${euro(station.price)} €/L` }).addTo(markers);
         const popup = document.createElement('div');
         const label = document.createElement('strong');
         label.textContent = station.name;
         popup.append(label, document.createElement('br'), `${euro(station.price)} €/L · ${station.address}`);
         marker.bindPopup(popup);
+        marker.on('click', () => selectStation(id));
+        markerById.set(id, marker);
         bounds.push([station.lat, station.lon]);
       }
     }
@@ -113,9 +184,12 @@ export function initStations() {
       note.textContent = 'Es mostren les primeres 120. Ordena per preu per veure les més barates.';
       list.append(note);
     }
+    if (selectedId && itemById.has(selectedId)) selectStation(selectedId, false, false);
+    else selectedId = null;
     if (map) {
       map.invalidateSize();
-      if (mode === 'gps' && point) map.setView([point.lat, point.lon], radius <= 10 ? 12 : radius <= 25 ? 10 : 9);
+      if (selectedId && markerById.has(selectedId)) map.setView(markerById.get(selectedId).getLatLng(), Math.max(map.getZoom(), 14));
+      else if (mode === 'gps' && point) map.setView([point.lat, point.lon], radius <= 10 ? 12 : radius <= 25 ? 10 : 9);
       else if (bounds.length) map.fitBounds(bounds, { padding: [25, 25], maxZoom: 11 });
     }
   }
@@ -160,7 +234,7 @@ export function initStations() {
     }
     const previous = ids.map(cachedProvince);
     if (previous.every(Boolean)) showResults(previous, previous.some((item) => Date.now() - item.at >= 30 * 60_000));
-    else { list.replaceChildren(); if (markers) markers.clearLayers(); setStatus('Carregant preus oficials…'); updated.textContent = ''; }
+    else { list.replaceChildren(); legend.hidden = true; selectedId = null; itemById.clear(); markerById.clear(); if (markers) markers.clearLayers(); setStatus('Carregant preus oficials…'); updated.textContent = ''; }
     const needsRefresh = fresh || previous.some((item) => !item || Date.now() - item.at >= 30 * 60_000);
     if (!needsRefresh) return;
     try {

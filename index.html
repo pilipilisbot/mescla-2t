@@ -64,6 +64,12 @@
         <div class="station-filters"><label for="radius-select">Radi <select id="radius-select"><option value="10">10 km</option><option value="25" selected>25 km</option><option value="50">50 km</option></select></label><label for="sort-select">Ordena <select id="sort-select"><option value="distance">Distància</option><option value="price">Preu</option></select></label><button type="button" id="stations-refresh" class="refresh-button">Actualitza</button></div>
         <p id="stations-status" class="stations-status" role="status" aria-live="polite">Prem «A prop meu» o tria una província.</p>
         <p id="stations-updated" class="stations-updated"></p>
+        <div id="stations-legend" class="stations-legend" aria-label="Semàfor de preus de les gasolineres visibles" hidden>
+          <span class="legend-item tier-cheap"><i aria-hidden="true"></i>Barates <strong id="stations-cheapest"></strong></span>
+          <span class="legend-item tier-medium"><i aria-hidden="true"></i>Mitjanes</span>
+          <span class="legend-item tier-expensive"><i aria-hidden="true"></i>Cares <strong id="stations-priciest"></strong></span>
+        </div>
+        <p class="stations-legend-note">Colors relatius al preu mínim i màxim de les estacions mostrades.</p>
         <div id="stations-map" class="stations-map" aria-label="Mapa de gasolineres"></div>
         <ol id="stations-list" class="stations-list"></ol>
         <p class="stations-source">Preus: Ministeri per a la Transició Ecològica. Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>. La disponibilitat i el preu final s’han de confirmar a l’estació.</p>

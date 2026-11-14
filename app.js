@@ -149,7 +149,7 @@ if ('serviceWorker' in navigator) {
 
   window.addEventListener('load', async () => {
     try {
-      const registration = await navigator.serviceWorker.register('./service-worker.js?v=8', { scope: './', updateViaCache: 'none' });
+      const registration = await navigator.serviceWorker.register('./service-worker.js?v=9', { scope: './', updateViaCache: 'none' });
       let lastCheck = Date.now();
       const checkForUpdates = () => {
         if (document.visibilityState !== 'visible' || Date.now() - lastCheck < 30000) return;
