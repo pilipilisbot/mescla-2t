@@ -1,4 +1,4 @@
-const CACHE = 'mescla-2t-v6';
+const CACHE = 'mescla-2t-v7';
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './math.js', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png'];
 
 function versionedUrl(url) {

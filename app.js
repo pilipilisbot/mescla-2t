@@ -6,8 +6,11 @@ const format = (value, digits = 2) => new Intl.NumberFormat('ca-ES', { maximumFr
 const $ = (id) => document.getElementById(id);
 const savedPercent = Number(localStorage.getItem('mescla-percent'));
 const state = {
-  mode: 'fuel',
-  amounts: { fuel: '5', oil: '100' },
+  mode: localStorage.getItem('mescla-mode') === 'oil' ? 'oil' : 'fuel',
+  amounts: {
+    fuel: localStorage.getItem('mescla-amount-fuel') ?? '5',
+    oil: localStorage.getItem('mescla-amount-oil') ?? '100',
+  },
   percent: savedPercent >= 0.1 && savedPercent <= 10 ? savedPercent : 2,
   custom: false,
 };
@@ -31,6 +34,7 @@ function renderMode() {
     button.addEventListener('click', () => {
       state.amounts[state.mode] = String(value);
       $('amount').value = String(value);
+      localStorage.setItem(`mescla-amount-${state.mode}`, String(value));
       update();
     });
     return button;
@@ -97,8 +101,16 @@ function update() {
   }
 }
 
-for (const mode of ['fuel', 'oil']) $('mode-' + mode).addEventListener('click', () => { state.mode = mode; renderMode(); });
-$('amount').addEventListener('input', (event) => { state.amounts[state.mode] = event.target.value; update(); });
+for (const mode of ['fuel', 'oil']) $('mode-' + mode).addEventListener('click', () => {
+  state.mode = mode;
+  localStorage.setItem('mescla-mode', mode);
+  renderMode();
+});
+$('amount').addEventListener('input', (event) => {
+  state.amounts[state.mode] = event.target.value;
+  localStorage.setItem(`mescla-amount-${state.mode}`, event.target.value);
+  update();
+});
 $('custom-percent').addEventListener('input', update);
 renderPercents();
 if (state.custom) $('custom-percent').value = String(state.percent).replace('.', ',');
@@ -136,13 +148,12 @@ if ('serviceWorker' in navigator) {
 
   window.addEventListener('load', async () => {
     try {
-      const registerLatest = () => navigator.serviceWorker.register(`./service-worker.js?check=${Date.now()}`, { scope: './', updateViaCache: 'none' });
-      await registerLatest();
+      const registration = await navigator.serviceWorker.register('./service-worker.js?v=7', { scope: './', updateViaCache: 'none' });
       let lastCheck = Date.now();
       const checkForUpdates = () => {
         if (document.visibilityState !== 'visible' || Date.now() - lastCheck < 30000) return;
         lastCheck = Date.now();
-        registerLatest().catch(() => {});
+        registration.update().catch(() => {});
       };
       window.addEventListener('focus', checkForUpdates);
       document.addEventListener('visibilitychange', checkForUpdates);
